@@ -2,7 +2,7 @@
 #   F1 Countdown
 #
 # Dependencies:
-#   None
+#   ical, moment
 #
 # Configuration:
 #   None
