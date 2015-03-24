@@ -17,21 +17,21 @@ moment = require('moment')
 module.exports = (robot) ->
   robot.respond /countdown/i, (msg) ->
     currentTime = moment()
-    currentEvent = undefined
+    upcomingEvent = undefined
     ical.fromURL(
       'https://www.google.com/calendar/ical/hendnaic1pa2r3oj8b87m08afg%40group.calendar.google.com/public/basic.ics', 
       {}, 
       (err, data) -> 
         for own k, ev of data
           eventTime = moment(ev.start)
-          if eventTime.isAfter(currentTime)
-            if currentEvent == undefined
-              currentEvent = ev
+          if currentTime.isBefore(eventTime)
+            if upcomingEvent == undefined
+              upcomingEvent = ev
             else
-              if moment(currentEvent.start).isAfter(eventTime)
-                currentEvent = ev
-        diff = moment.duration(moment(currentEvent.start).diff(currentTime))
-        result = currentEvent.summary + ' starts in '
+              if eventTime.isBefore(upcomingEvent.start)
+                upcomingEvent = ev
+        diff = moment.duration(moment(upcomingEvent.start).diff(currentTime))
+        result = upcomingEvent.summary + ' starts in '
         result += Math.floor(diff.asDays()).toString() + ' days '
         result += diff.hours().toString() + ':' + pad2(diff.minutes().toString()) + ':' + pad2(diff.seconds().toString())
         msg.reply result
