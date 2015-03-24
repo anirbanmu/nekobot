@@ -33,7 +33,14 @@ module.exports = (robot) ->
         diff = moment.duration(moment(currentEvent.start).diff(currentTime))
         result = currentEvent.summary + ' starts in '
         result += Math.floor(diff.asDays()).toString() + ' days '
-        result += diff.hours().toString() + ':' + diff.minutes().toString() + ':' + diff.seconds().toString()
+        result += diff.hours().toString() + ':' + pad2(diff.minutes().toString()) + ':' + pad2(diff.seconds().toString())
         msg.reply result
       )
+
+pad = (n, width, z) ->
+  z = z || '0'
+  n = n + ''
+  return if n.length >= width then n else new Array(width - n.length + 1).join(z) + n
+  
+pad2 = (n) -> return pad(n, 2, '0')
 
