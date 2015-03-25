@@ -8,42 +8,47 @@
 #   None
 #
 # Commands:
-#   hubot countdown - Responds with time left until next F1 event or displays time until in session F1 event end.
+#   hubot countdown - Responds with time left until next F1 event or displays time until end of in-session F1 event.
+#   hubot countdownNext - Responds with time left until next F1 event.
 #
 
 ical = require('ical')
 moment = require('moment')
 
 module.exports = (robot) ->
-  robot.respond /countdown/i, (msg) ->
-    currentTime = moment()
-    
-    closestEvent =
-      ev: undefined,
-      inSession: false
+  robot.respond /countdown(next)*/i, (msg) ->
+    countdown(msg, msg.match[1] == undefined)
 
-    ical.fromURL(
-      'https://www.google.com/calendar/ical/hendnaic1pa2r3oj8b87m08afg%40group.calendar.google.com/public/basic.ics', 
-      {},
-      (err, data) ->
-        for own k, ev of data
-          eventStartTime = moment(ev.start)
+countdown = (msg, reportInSession) ->
+  currentTime = moment()
+  
+  closestEvent =
+    ev: undefined,
+    inSession: false
 
-          if ev.end != undefined
-            closestEvent.inSession = currentTime.isBetween(ev.start, ev.end)
-            if closestEvent.inSession
+  ical.fromURL(
+    'https://www.google.com/calendar/ical/hendnaic1pa2r3oj8b87m08afg%40group.calendar.google.com/public/basic.ics', 
+    {},
+    (err, data) ->
+      for own k, ev of data
+        eventStartTime = moment(ev.start)
+
+        if reportInSession && ev.end != undefined
+          inSession = currentTime.isBetween(ev.start, ev.end)
+          if inSession
+            closestEvent.inSession = true
+            closestEvent.ev = ev
+            break
+
+        if currentTime.isBefore(eventStartTime)
+          if closestEvent.ev == undefined
+            closestEvent.ev = ev
+          else
+            if eventStartTime.isBefore(closestEvent.ev.start)
               closestEvent.ev = ev
-              break
 
-          if currentTime.isBefore(eventStartTime)
-            if closestEvent.ev == undefined
-              closestEvent.ev = ev
-            else
-              if eventStartTime.isBefore(closestEvent.ev.start)
-                closestEvent.ev = ev
-
-        msg.reply composeReply(closestEvent, currentTime) 
-      )
+      msg.reply composeReply(closestEvent, currentTime) 
+    )
 
 composeReply = (event, currentTime) ->
   reply = event.ev.summary
