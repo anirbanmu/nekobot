@@ -15,40 +15,46 @@
 ical = require('ical')
 moment = require('moment')
 
+cachedCalData = undefined
+ical.fromURL(
+  'https://www.google.com/calendar/ical/hendnaic1pa2r3oj8b87m08afg%40group.calendar.google.com/public/basic.ics', 
+  {},
+  (err, data) ->
+    cachedCalData = data
+  )
+
 module.exports = (robot) ->
   robot.respond /countdown(next)*/i, (msg) ->
     countdown(msg, msg.match[1] == undefined)
 
 countdown = (msg, reportInSession) ->
+  if cachedCalData == undefined
+    return
+
   currentTime = moment()
   
   closestEvent =
     ev: undefined,
     inSession: false
 
-  ical.fromURL(
-    'https://www.google.com/calendar/ical/hendnaic1pa2r3oj8b87m08afg%40group.calendar.google.com/public/basic.ics', 
-    {},
-    (err, data) ->
-      for own k, ev of data
-        eventStartTime = moment(ev.start)
+  for own k, ev of cachedCalData
+    eventStartTime = moment(ev.start)
 
-        if reportInSession && ev.end != undefined
-          inSession = currentTime.isBetween(ev.start, ev.end)
-          if inSession
-            closestEvent.inSession = true
-            closestEvent.ev = ev
-            break
+    if reportInSession && ev.end != undefined
+      inSession = currentTime.isBetween(ev.start, ev.end)
+      if inSession
+        closestEvent.inSession = true
+        closestEvent.ev = ev
+        break
 
-        if currentTime.isBefore(eventStartTime)
-          if closestEvent.ev == undefined
-            closestEvent.ev = ev
-          else
-            if eventStartTime.isBefore(closestEvent.ev.start)
-              closestEvent.ev = ev
+    if currentTime.isBefore(eventStartTime)
+      if closestEvent.ev == undefined
+        closestEvent.ev = ev
+      else
+        if eventStartTime.isBefore(closestEvent.ev.start)
+          closestEvent.ev = ev
 
-      msg.reply composeReply(closestEvent, currentTime) 
-    )
+  msg.reply composeReply(closestEvent, currentTime)
 
 composeReply = (event, currentTime) ->
   reply = event.ev.summary
