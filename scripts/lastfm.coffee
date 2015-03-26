@@ -9,13 +9,13 @@
 #   HUBOT_LASTFM_SECRET
 #
 # Commands:
-#   hubot now playing <username> - Fetches current playing or most recently played track by username specified.
+#   now playing <username> - Fetches current playing or most recently played track by username specified.
 #
 
 LastFmNode = require('lastfm').LastFmNode
 
 module.exports = (robot) ->
-  robot.respond /now\s*playing\s*(\S+)/i, (msg) ->
+  robot.hear /^now\s*playing\s*(\S+)/i, (msg) ->
     lastfm = new LastFmNode (
       {
         api_key: process.env.HUBOT_LASTFM_APIKEY,
