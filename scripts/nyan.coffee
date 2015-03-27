@@ -34,5 +34,5 @@ nyan = [
 
 module.exports = (robot) ->
   robot.hear /nekobot/i, (msg) ->
-    sound = nyan[Math.floor(Math.random() * nyan.length)]
+    sound = msg.random nyan
     msg.emote '_' + sound + '_'
