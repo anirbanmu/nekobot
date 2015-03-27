@@ -1,5 +1,5 @@
 # Description:
-#   Pings user with a reminder
+#   Pings user with a reminder. Note: the reminders are lost after bot is restarted
 #
 # Dependencies:
 #   None
@@ -8,7 +8,7 @@
 #   None
 #
 # Commands:
-#   `nekobot remindme hh:mm [optional msg]` to be pinged in hh:mm
+#   `nekobot remindme [hh:mm|hh:mm:ss] [optional msg]` to be pinged after specified time period
 #
 
 moment = require('moment')
