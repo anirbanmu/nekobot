@@ -18,9 +18,10 @@ module.exports = (robot) ->
     duration = moment.duration(msg.match[1])
     message = msg.match[3]
     setTimeout () ->
-      humanizedDuration = moment.duration(0).subtract(duration).humanize(true)
+      humanizedDuration = moment.duration(0).subtract(duration).humanize()
       if message == undefined
-        msg.reply 'Here\'s your reminder from ' + humanizedDuration
+        msg.reply 'Here\'s your reminder from about ' + humanizedDuration + ' ago'
       else
-        msg.reply message + ' (reminder set ' + humanizedDuration + ')'
+        msg.reply message + ' (reminder set about ' + humanizedDuration + ' ago)'
     , duration.asMilliseconds()
+    msg.reply 'I\'ll remind you in about ' + duration.humanize()
