@@ -31,15 +31,18 @@ module.exports = (robot) ->
         extended: 1,
         handlers: {
           success: (data) ->
-            msg.reply latest(data.recenttracks)
+            tracks = data.recenttracks
+            track = tracks.track[0]
+            robot.http(track.url)
+              .get() (err, res, body) ->
+                msg.reply latest(tracks['@attr'].user, track) + ' - ' + bestLink(track.url, body)
           error: (error) ->
         }
       }
     )
 
-latest = (tracks) ->
-  reply = tracks['@attr'].user
-  track = tracks.track[0]
+latest = (user, track) ->
+  reply = user
 
   nowPlaying = track['@attr'] != undefined && track['@attr'].nowplaying == 'true'
   if nowPlaying
@@ -51,6 +54,10 @@ latest = (tracks) ->
   if !nowPlaying && track.date != undefined
     reply += ' on ' + track.date['#text'] + ' (UTC)'
 
-  reply += ' - ' + track.url
-
   return reply
+
+bestLink = (baseURL, rawHTML) ->
+  youtube = rawHTML.match /data-youtube-player-id="(.*?)"/i
+  if youtube
+    return 'http://www.youtube.com/watch?v=' + youtube[1]
+  return baseURL
