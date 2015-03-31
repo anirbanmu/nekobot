@@ -33,9 +33,12 @@ module.exports = (robot) ->
           success: (data) ->
             tracks = data.recenttracks
             track = tracks.track[0]
+            reply = latest(tracks['@attr'].user, track)
             robot.http(track.url)
               .get() (err, res, body) ->
-                msg.reply latest(tracks['@attr'].user, track) + ' - ' + bestLink(track.url, body)
+                if !err && res.statusCode == 200
+                  reply += ' - ' + bestLink(track.url, body)
+                msg.reply reply
           error: (error) ->
         }
       }
