@@ -15,7 +15,7 @@
 LastFmNode = require('lastfm').LastFmNode
 
 module.exports = (robot) ->
-  robot.hear /^now\s*playing\s*(\S+)/i, (msg) ->
+  robot.hear /^now\s*playing\s*(\S*)/i, (msg) ->
     lastfm = new LastFmNode (
       {
         api_key: process.env.HUBOT_LASTFM_APIKEY,
@@ -26,7 +26,7 @@ module.exports = (robot) ->
     lastfm.request(
       'user.getRecentTracks',
       {
-        user: msg.match[1],
+        user: if msg.match[1] then msg.match[1] else msg.message.user.name,
         limit: 2,
         extended: 1,
         handlers: {
