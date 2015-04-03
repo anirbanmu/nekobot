@@ -9,7 +9,7 @@
 #   HUBOT_LASTFM_SECRET
 #
 # Commands:
-#   now playing <username> - Fetches current playing or most recently played track by username specified.
+#   now playing <username> - Fetches current playing or most recently played track by username specified. If <username> is omitted, requester's username is used instead.
 #
 
 LastFmNode = require('lastfm').LastFmNode
