@@ -32,7 +32,14 @@ nyan = [
   'yaong',
   ]
 
+nyanMatchString = 
+  nyan.map (string) ->
+    '|'+string
+  .join '' 
+
+nyanRegExp = new RegExp("nekobot" + nyanMatchString, "i")
+
 module.exports = (robot) ->
-  robot.hear /nekobot/i, (msg) ->
+  robot.hear nyanRegExp, (msg) ->
     sound = msg.random nyan
     msg.emote '_' + sound + '_'
