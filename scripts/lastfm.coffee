@@ -60,7 +60,12 @@ latest = (user, track) ->
   return reply
 
 bestLink = (baseURL, rawHTML) ->
+  spotify = rawHTML.match /data-uri="spotify:track:(.*?)"/i
+  if spotify
+    return 'http://play.spotify.com/track/' + spotify[1]
+
   youtube = rawHTML.match /data-youtube-player-id="(.*?)"/i
   if youtube
     return 'http://www.youtube.com/watch?v=' + youtube[1]
+
   return baseURL
